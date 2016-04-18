@@ -17,9 +17,9 @@ function filtered = filterecg(ecg, varargin)
             fh = 50;    % high cutoff
             fn = 60;    % notch
         case 4
-            fl = varargin(1);   % low cutoff
-            fh = varargin(2);   % high cutoff
-            fn = varargin(3);   % notch
+            fl = varargin{1};   % low cutoff
+            fh = varargin{2};   % high cutoff
+            fn = varargin{3};   % notch
         otherwise
             error('filterecg: must specify exactly three frequencies');
             return
