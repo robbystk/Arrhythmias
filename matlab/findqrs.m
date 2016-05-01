@@ -9,10 +9,10 @@ function peaks = findqrs(ecg)
     fecg = filterecg(ecg);
     % fecg = ecg;
     % extract signal and sample frequency
-    sig = fecg.signal;
+    fsig = fecg.signal;
     fs = fecg.fs;
     % first difference
-    sig = filter([1 -1],1,sig);
+    sig = filter([1 -1],1,fsig);
     % square 
     sig = sig .* sig;
     % moving average
@@ -21,10 +21,23 @@ function peaks = findqrs(ecg)
     b = ones(1,W) / W;          % W-sample average
     sig = filtfilt(b,1,sig);    % compute moving average
     
-    % plot(sig);
-    
     % threshold
-    % get ranges
-    % maximum (magnitude) in each range
+    threshold = 1;
+    th = sig > threshold * rms(sig);    
+        % 1 if moving average is above threshold, 0 otherwise
+    dth = filter([1 -1],1,th);  % derivative of threshold signal:
+        % 1 at start of range, -1 at end
     
+    % get ranges
+    starts = find(dth == 1);    % list of range starts
+    stops = find(dth == -1);    % list of range ends
+    
+    Nbeats = min(length(starts), length(stops));    % number of ranges
+    
+    % maximum (magnitude) in each range
+    for i = 1:Nbeats
+        excerpt = fsig(starts(i):stops(i));
+        [M,peak] = max(excerpt);
+        peaks(i) = peak + starts(i) - 1;
+    end % for
 end % function
