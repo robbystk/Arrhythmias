@@ -18,7 +18,7 @@ function ecg = fetch(url)
     ret.time = tm;
     ret.N = length(sig);
     ret.ann = ann(type ~= '+');
-    ret.Nann = length(ann);
+    ret.Nann = length(ret.ann);
     ret.fs = (ret.N - 1) / (tm(ret.N) - tm(1));
     
     % return ECG struct
