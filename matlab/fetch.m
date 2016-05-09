@@ -17,7 +17,8 @@ function ecg = fetch(url)
     ret.signal = sig;
     ret.time = tm;
     ret.N = length(sig);
-    ret.ann = ann(type ~= '+');
+    ret.ann = ann(ismember(type,'NLRBAaJSVrFejnE/fQ?'));
+    ret.type = type(ismember(type,'NLRBAaJSVrFejnE/fQ?'));
     ret.Nann = length(ret.ann);
     ret.fs = (ret.N - 1) / (tm(ret.N) - tm(1));
     
