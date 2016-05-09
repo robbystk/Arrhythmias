@@ -12,7 +12,7 @@ function peaks = findqrs(ecg)
     fsig = fecg.signal;
     fs = fecg.fs;
     % first difference
-    sig = filter([1 -1],1,fsig);
+    sig = gradient(fsig);
     % square 
     sig = sig .* sig;
     % moving average
@@ -25,7 +25,7 @@ function peaks = findqrs(ecg)
     threshold = 1;
     th = sig > threshold * rms(sig);    
         % 1 if moving average is above threshold, 0 otherwise
-    dth = filter([1 -1],1,th);  % derivative of threshold signal:
+    dth = 2*gradient(double(th));   % derivative of threshold signal:
         % 1 at start of range, -1 at end
     
     % get ranges
