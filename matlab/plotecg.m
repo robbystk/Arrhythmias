@@ -18,7 +18,7 @@ function plotecg(ecg, varargin)
         case 2
             beats = varargin{1};
             t_range = ecg.time(ecg.ann(varargin{1}));
-            limits = [min(t_range) - 0.5, max(t_range) + 0.5];
+            limits = [max(min(t_range)-0.5,0), max(t_range) + 0.5];
     end % switch
 
     hold on;
