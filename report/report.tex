@@ -20,7 +20,19 @@ Electrocardiography Data}
 \maketitle
 
 \begin{abstract}
-    I fucking suck at life
+    The diagnosis of cardiac arrhythmias can be a tedious process when done by
+    hand and could benefit greatly from computer automation.  To this end, an 
+    algorithm was developed to distinguish between normal heart beats and
+    abnormal arrhythmic beats in an ECG waveform.  First an algorithm was
+    developed to find the location of QRS complexes in the ECG waveform.
+    Principal component analysis was performed using the area around the QRS 
+    complex.  20 of the resulting principal components were used to train a
+    simple linear classifier to distinguish between normal and abnormal beats.
+    The QRS detection algorithm performed very well with x\% false negatives and
+    y\% false positives.  The classification algorithm did not fare quite as 
+    well with and x\% false positive rate and y\% false negative rate.  More
+    sophisticated signal processing techniques could be applied to improve these
+    numbers, but the algorithm is good starting point.  
 \end{abstract}
 
 \section{Introduction} 
