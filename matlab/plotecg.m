@@ -9,6 +9,7 @@ function plotecg(ecg)
     title('ECG');
     xlabel('Time [s]');
     ylabel('Amplitude');
+    xlim([min(ecg.time), max(ecg.time)]);
 
     hold on;
     ys = ylim();
