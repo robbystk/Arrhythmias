@@ -4,6 +4,20 @@
 \usepackage{hyperref}
 \usepackage{graphicx}
 \usepackage{verbatim}
+\usepackage{listings}
+\lstset{%
+    basicstyle=\scriptsize\ttfamily, %
+    language=Matlab, %
+    keywordstyle=\color{blue},%
+    commentstyle=\color{green!50!black},%
+    numberstyle=\color{gray},%
+    stringstyle=\color{magenta!70!blue},%
+    deletekeywords={type},%
+    otherkeywords={xlim,ylim,ones},%
+    numbers=left,%
+    showstringspaces=false,%
+}
+
 \usepackage{tikz}
 
 \tikzstyle{block}=[rectangle,draw=black,thick,minimum size=1.2cm]
@@ -201,37 +215,37 @@ analysis.
 \section{Matlab Code}
 \subsection{\texttt{fetch()}}
 \label{fun:fetch}
-\verbatiminput{../matlab/fetch.m}
+\lstinputlisting{../matlab/fetch.m}
 \subsection{\texttt{filterecg()}}
 \label{fun:filter}
-\verbatiminput{../matlab/filterecg.m}
+\lstinputlisting{../matlab/filterecg.m}
 \subsection{\texttt{findqrs()}}
 \label{fun:qrs}
-\verbatiminput{../matlab/findqrs.m}
+\lstinputlisting{../matlab/findqrs.m}
 \subsection{\texttt{crop()}}
 \label{fun:crop}
-\verbatiminput{../matlab/crop.m}
+\lstinputlisting{../matlab/crop.m}
 \subsection{\texttt{pca\_transform()}}
 \label{fun:pca}
-\verbatiminput{../matlab/pca_transform.m}
+\lstinputlisting{../matlab/pca_transform.m}
 \subsection{\texttt{plotpca()}}
 \label{fun:plotpca}
-\verbatiminput{../matlab/plotpca.m}
+\lstinputlisting{../matlab/plotpca.m}
 \subsection{\texttt{plotecg()}}
 \label{fun:plotecg}
-\verbatiminput{../matlab/plotecg.m}
+\lstinputlisting{../matlab/plotecg.m}
 \subsection{\texttt{texify()}}
 \label{fun:tex}
-\verbatiminput{../matlab/texify.m}
+\lstinputlisting{../matlab/texify.m}
 \subsection{\texttt{gather.m}}
 \label{scr:gather}
-\verbatiminput{../matlab/gather.m}
+\lstinputlisting{../matlab/gather.m}
 \subsection{\texttt{figures.m}}
 \label{scr:figures}
-\verbatiminput{../matlab/figures.m}
+\lstinputlisting{../matlab/figures.m}
 \subsection{\texttt{train.m}}
 \label{scr:train}
-\verbatiminput{../matlab/train.m}
+\lstinputlisting{../matlab/train.m}
 
 \bibliography{sources}
 \bibliographystyle{IEEEtran}
