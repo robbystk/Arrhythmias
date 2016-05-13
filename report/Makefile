@@ -1,5 +1,6 @@
 # File names
 BASE	= report
+SOURCES = sources
 
 # How to view output files
 VIEWER  = zathura
@@ -34,7 +35,7 @@ ${BASE}.ps: ${BASE}.dvi
 	@dvips -q $<
 
 # --- DVI ---------------------------------------
-${BASE}.dvi: ${BASE}.tex ${BASE}.toc ${BASE}.aux 
+${BASE}.dvi: ${BASE}.tex ${BASE}.toc ${BASE}.bbl
 	@echo "TEX  ${BASE}.tex"
 	@latex ${BASE}.tex >/dev/null
 
@@ -47,6 +48,11 @@ ${BASE}.toc: ${BASE}.tex
 ${BASE}.aux: ${BASE}.tex 
 	@echo "AUX  ${BASE}.tex"
 	@latex -draftmode ${BASE}.tex >/dev/null
+
+# --- BBL ---------------------------------------
+${BASE}.bbl: ${BASE}.aux ${SOURCES}.bib
+	@echo "BIB  ${BASE}.tex"
+	@bibtex ${BASE}.aux >/dev/null
 
 # --- VIEW --------------------------------------
 view-%: ${BASE}.%
