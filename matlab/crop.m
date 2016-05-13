@@ -1,19 +1,14 @@
-function excerpt = crop(ecg, n, varargin)
+function excerpt = crop(ecg, beats, varargin)
 % crop:     extracts a portion of an ECG signal around the nth marker in
 %           the list of annotations
-%   usage:  excerpt = crop(ecg, n);
-%       or: excerpt = crop(ecg, n, before, after);
+%   usage:  excerpt = crop(ecg, beats);
+%       or: excerpt = crop(ecg, beats, before, after);
 %   input:  the ECG struct to be cropped
 %           the number of the beat to extract
 %           time in seconds before beat to begin excerpt (optional)
 %           time in seconds after beat to end excerpt (optional)
 %   output: an ECG struct with the extracted data, including the beat
-%           annotation
-
-if n > ecg.Nann
-    error('crop: n is too big');
-    return
-end % if
+%           annotations
 
 % offsets
 switch nargin
@@ -29,22 +24,17 @@ switch nargin
 end % switch
 
 % convert times to indices
-b_index = ecg.ann(n) - floor(before * ecg.fs);
-a_index = ecg.ann(n) + floor(after * ecg.fs);
+b_offset = floor(before * ecg.fs);
+a_offset = floor(after * ecg.fs);
 
-% clip indices within bounds
-if b_index < 1
-    b_index = 1;
-end % if
-
-if a_index > ecg.N
-    a_index = ecg.N;
-end % if
+% start and end index
+s_index = max(1,ecg.ann(beats) - b_offset);
+e_index = min(ecg.N,ecg.ann(beats) + a_offset);
 
 excerpt = ecg;
-excerpt.signal = ecg.signal(b_index:a_index);
-excerpt.time = ecg.time(b_index:a_index);
-excerpt.N = a_index - b_index + 1;
-excerpt.ann = ecg.ann(n) - b_index + 1;
+excerpt.signal = ecg.signal(s_index:e_index);
+excerpt.time = ecg.time(s_index:e_index);
+excerpt.N = e_index - s_index + 1;
+excerpt.ann = ecg.ann(beats) - s_index + 1;
 excerpt.Nann = 1;
 end %function
