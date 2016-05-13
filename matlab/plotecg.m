@@ -6,11 +6,14 @@ function plotecg(ecg)
 %   output: none
 
     plot(ecg.time,ecg.signal); 
-    title('ECG');
-    xlabel('Time [s]');
-    ylabel('Amplitude');
+    title('ECG','Interpreter','Latex');
+    xlabel('Time [s]','Interpreter','Latex');
+    ylabel('Amplitude','Interpreter','Latex');
     xlim([min(ecg.time), max(ecg.time)]);
 
+    fig = gcf;
+    fig.CurrentAxes.TickLabelInterpreter = 'Latex';
+    
     hold on;
     ys = ylim();
     ty = ys(2) - (ys(2) - ys(1)) * 0.9;
