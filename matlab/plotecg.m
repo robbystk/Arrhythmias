@@ -15,11 +15,7 @@ function plotecg(ecg, varargin)
     ys = ylim();
 
     if nargin > 1 && ismember('Latex',varargin)
-        fig = gcf;
-        fig.CurrentAxes.TickLabelInterpreter = 'Latex';
-        fig.CurrentAxes.Title.Interpreter = 'Latex';
-        fig.CurrentAxes.XLabel.Interpreter = 'Latex';
-        fig.CurrentAxes.YLabel.Interpreter = 'Latex';
+        texify(gcf);
     end %latex if
     if ismember('Annotate',varargin) && isfield(ecg,'type')
         ty = ys(2) - (ys(2) - ys(1)) * 0.1;
