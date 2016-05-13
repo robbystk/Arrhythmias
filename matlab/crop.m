@@ -27,14 +27,18 @@ end % switch
 b_offset = floor(before * ecg.fs);
 a_offset = floor(after * ecg.fs);
 
+% first and last beats
+first_beat = max(0,min(beats));
+last_beat = min(ecg.Nann,max(beats));
+
 % start and end index
-s_index = max(1,ecg.ann(beats) - b_offset);
-e_index = min(ecg.N,ecg.ann(beats) + a_offset);
+s_index = max(1,ecg.ann(first_beat) - b_offset);
+e_index = min(ecg.N,ecg.ann(last_beat) + a_offset);
 
 excerpt = ecg;
 excerpt.signal = ecg.signal(s_index:e_index);
 excerpt.time = ecg.time(s_index:e_index);
 excerpt.N = e_index - s_index + 1;
 excerpt.ann = ecg.ann(beats) - s_index + 1;
-excerpt.Nann = 1;
+excerpt.Nann = length(excerpt.ann);
 end %function
