@@ -148,23 +148,19 @@ different were used.  In addition to the principal components, the R-R interval
 for each beat was also found and used as an additional component.  
 
 \section{Implementation}
+
 The algorithm was implemented in MATLAB.  All code used is included in the
 appendix and available on github at
 \url{https://github.com/robbystk/Arrythmias}. The first step was to download ECG
 data and annotations from Physionet using the \verb`rdsamp()` and \verb`rdann()`
-functions from Physionet's WFDB toolbox as follows: 
-\begin{verbatim}
-[tm,sig] = rdsamp(url,1);
-[ann,type,subtype,chan,num,comments] = rdann(url,'atr');
-\end{verbatim}
-Where \verb`url` is the Physionet URL from which to download the data, e.g\@.
-\verb`'mitdb/100'`.  These lines were wrapped in a function to make them easier
-to use.  See page \pageref{fun:fetch} for the full function.  Figure
-\ref{fig:raw} shows an example of ECG data directly from physionet with beat
-annotations.  The annotations do not always correspond directly with the
-location of the QRS complex because they correspond to the entire beat rather
-than a specific feature.  So the next step is to determine the exact location of
-the QRS complexes.  
+functions from Physionet's WFDB toolbox.  These functions were wrapped in
+another function, \verb`fetch()`, to make them easier to use.  See page
+\pageref{fun:fetch} for the full function.  Figure \ref{fig:raw} shows an
+example of ECG data directly from physionet with beat annotations.  The
+annotations do not always correspond directly with the location of the QRS
+complex because they correspond to the entire beat rather than a specific
+feature.  So the next step is to determine the exact location of the QRS
+complexes.  
 
 \begin{figure}[hbtp]
     \centering
@@ -174,14 +170,20 @@ the QRS complexes.
     \label{fig:raw}
 \end{figure}
 
-The first step in the Pan-Tomkins alorithm is to filter the signal.  This was
-done by a fourth-order Butterworth bandpass filter with cutoffs at 1 and 50Hz, 
-as well as a notch filter at 60Hz.  The full implementation is shown in the
-\verb`filterecg()` function in section \rpref{fun:filter}.  The effect of this
-filter on an ECG signal is shown in Figure \ref{fig:filter}.  The rest of the
-QRS-detection algorithm was implemented in the function \verb`findqrs()` shown
-in section \rpref{fun:qrs}.  Figure \ref{fig:qrs} shows an example of the
-signals at each stage of the algorithm.  
+The first step in the Pan-Tomkins QRS-Detection algorithm is to filter the
+signal.  This was done by a fourth-order Butterworth bandpass filter with
+cutoffs at 1 and 50Hz, as well as a notch filter at 60Hz.  The full
+implementation is shown in the \verb`filterecg()` function in section
+\rpref{fun:filter}.  The effect of this filter on an ECG signal is shown in
+Figure \ref{fig:filter}.  The rest of the QRS-detection algorithm was
+implemented in the function \verb`findqrs()` shown in section \rpref{fun:qrs}.
+Figure \ref{fig:qrs} shows an example of the signals at each stage of the
+algorithm.  The QRS-detection function performed relatively well, accurately
+finding the location of the QRS complex of most beats.  Occasionally it would
+miss a particularly malformed beat, or find a beat were there was none,
+especially if the signal was particularly noisy.  Figure \ref{fig:perf} shows a
+closer look at the location of the R-wave determined by the algorithm, and an
+example of some erroneously-detected beats.
 
 \begin{figure}[hbtp]
     \centering
@@ -192,60 +194,175 @@ signals at each stage of the algorithm.
 
 \begin{figure}[hbtp]
     \centering
-    \includegraphics[height=0.44\textheight]{../figures/figures_03}
+    \includegraphics[height=0.42\textheight]{../figures/figures_03}
     \caption{Example Signals at the Various Stages of the Pan-Tompkins
     QRS-Detection Algorithm}
     \label{fig:qrs}
 \end{figure}
 
-It was decided to distinguish A form normal because
-reasons (mostly I'm a dumbass) Here's some plots and shit.  
+\begin{figure}[hbtp]
+    \centering
+    \includegraphics[height=0.42\textheight]{../figures/figures_04}
+    \caption{Performance of the QRS-Detection Algorithm}
+    \label{fig:perf}
+\end{figure}
 
-The ease of distinguishing an arrhythmia with DSP depends on the particular
-arrhythmia.  During research, an arrhythmia will be chosen that should be
-possible to distinguish using elementary signal processing techniques including
-IIR filtering, adaptive filtering, wavelet transforms, and frequency-domain
-analysis.  
+Based on initial investigation of the data, it was decided to develop a
+classifier to distinguish between normal and atrial premature beats, because
+these beats deviate little from normal beats, which will give the starting point
+for the entire classifier, the QRS-detection algorithm, more to work with.  
+
+To train the classifier, a large amount of data was collected and processed (see
+\verb`gather.m` in Section \rpref{scr:gather}).  Five recordings from the
+MIT-BIH ECG database were chosen because they include a large number of atrial
+premature beats.  These recordings were downloaded from physionet
+(\verb`gather.m` lines 3--10), and processed to extract a 0.6-second excerpt
+centered around the QRS complex for each normal and abnormal beat (lines
+12--48).  For each recording, the locations of normal and abnormal beats were
+determined from the included annotations (lines 16--20).  An equal number of
+normal and abnormal beats were randomly selected (lines 21--23) and extracted
+(lines 25--48).  The extraction process involved finding the QRS complex
+locations with \verb`findqrs()` (lines 25--29), and extracting the signal 0.3
+seconds before and after the QRS complex for both normal (lines 39--46) and
+abnormal (lines 31--37) beats.  The beat excerpts were compiled into two
+matrices (lines 36 and 45) for subsequent processing.  The function
+\verb`crop()`, shown in Section \rpref{fun:crop}, was created to facilitate
+extraction of the 0.6-second excerpts around each beat.  
+
+The data from \verb`gather.m` were further processed and used to train a linear
+classifier in \verb`train.m` shown in Section \rpref{scr:train}.  The normal and
+abnormal beat data were combined into one matrix (\verb`train.m` line 10) and
+normalized by subtracting the mean of each time point (lines 12--17).  Singular
+value decomposition was performed on the normalized data (line 19) to find a
+transformation matrix to transform the data onto an orthogonal basis of
+principal components.  A visualization of the transformation matrix is shown in
+Figure \ref{fig:transform} along with an example ECG waveform for reference.
+Each row of the matrix produces a different principal component as a linear
+combination of the value at each sample of the ECG signal.  The matrix is
+arranged so that the first principal component has the highest variance across
+the data.  Figure \ref{fig:var} shows the variances of the first 30 (out of 215)
+principal components.  
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[height=0.42\textheight]{../figures/train_01}
+    \caption{Principal Component Transformation Matrix with Reference ECG}
+    \label{fig:transform}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[height=0.42\textheight]{../figures/train_02}
+    \caption{Variances of the First 30 Principal Components}
+    \label{fig:var}
+\end{figure}
+
+In a linear classifier, high variance of a particular measurement does not
+necessarily correspond to better discrimination between two groups of data.  It
+is possible for the two groups to each have a wide distribution that overlaps
+almost completely with the other.  This would result in a large variance, but no
+ability to categorize the data.  On the other hand, it is possible for each
+group to have a narrow distribution, separated relatively little from the other
+group, but significant relative to the standard deviation.  For this reason, the
+components chosen to classify the data were not those with the most variance.
+Instead, the mean of each component for the two groups, normal and abnormal, was
+found (\verb`gather.m` lines 48--62).  The difference between these means (line
+63) normalized by the variance of that particular component, was used to select
+the top 20 `most-significant' components to be used for classification (lines 73
+and 83).  Figure \ref{fig:diff} shows the difference in means for the first 30
+Principal components (those with the largest variances).  Figure \ref{fig:sig}
+shows the 20 most-significant components (those with the most significant
+difference between the mean of the normal and abnormal data).  
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[height=0.42\textheight]{../figures/train_03}
+    \caption{Difference in Means for First 30 Principal Components (Those with
+    the Largest Variance)}
+    \label{fig:diff}
+\end{figure}
+
+\begin{figure}[hbtp]
+    \centering
+    \includegraphics[height=0.42\textheight]{../figures/train_04}
+    \caption{Difference In Means for the First 20 Most-Significant Components
+    (Those with the Largest Difference In Means)}
+    \label{fig:sig}
+\end{figure}
+
+The 20 most-significant components were used to train a linear classifier
+(\verb`train.m` lines 91--97) using the formula $\mathbf{w} = (\mathbf{X}^\top
+\mathbf{X})^+ \mathbf{X}^\top \mathbf{d}$ where $\mathbf{w}$ is a vector of
+weights for each component, $\mathbf{X}$ is the matrix of data with each column
+corresponding to a component and each row corresponding to a single point, and
+$\mathbf{d}$ is a vector of the desired response of the classifier for each row
+in $\mathbf{X}$.  In this case, $d_i = 0$ for normal beats, and 1 for abnormal
+beats.  Note also that $\mathbf{A}^+$ denotes the pseudo inverse of $\mathbf{A}$
+computed by MATLAB's \verb`pinv()` function.  Figure \ref{fig:classifier} shows
+the first two most-significant components and the decision boundary for those
+two components when every other component is equal to zero.  Note that since
+this is a two-dimensional projection of 20-dimensional data, which side of the
+line the a point falls on does not necessarily correspond to how it is
+classified.  All 20 dimensions are necessary to classify each point.  
+
+\begin{figure}[hbtp]
+    \centering
+    \includegraphics[height=0.42\textheight]{../figures/train_05}
+    \caption{First Two Most-Significant Components and Cross-Section of the
+    Classifier's Decision Boundary}
+    \label{fig:classifier}
+\end{figure}
 
 \section{Results}
 
 \section{Conclusion}
 
+\newpage
 \appendix
 \section{Matlab Code}
 \subsection{\texttt{fetch()}}
 \label{fun:fetch}
 \lstinputlisting{../matlab/fetch.m}
+
 \subsection{\texttt{filterecg()}}
 \label{fun:filter}
 \lstinputlisting{../matlab/filterecg.m}
+
 \subsection{\texttt{findqrs()}}
 \label{fun:qrs}
 \lstinputlisting{../matlab/findqrs.m}
+
 \subsection{\texttt{crop()}}
 \label{fun:crop}
 \lstinputlisting{../matlab/crop.m}
+
 \subsection{\texttt{pca\_transform()}}
 \label{fun:pca}
 \lstinputlisting{../matlab/pca_transform.m}
+
 \subsection{\texttt{plotpca()}}
 \label{fun:plotpca}
 \lstinputlisting{../matlab/plotpca.m}
+
 \subsection{\texttt{plotecg()}}
 \label{fun:plotecg}
 \lstinputlisting{../matlab/plotecg.m}
+
 \subsection{\texttt{texify()}}
 \label{fun:tex}
 \lstinputlisting{../matlab/texify.m}
+
 \subsection{\texttt{gather.m}}
 \label{scr:gather}
 \lstinputlisting{../matlab/gather.m}
-\subsection{\texttt{figures.m}}
-\label{scr:figures}
-\lstinputlisting{../matlab/figures.m}
+
 \subsection{\texttt{train.m}}
 \label{scr:train}
 \lstinputlisting{../matlab/train.m}
+
+\subsection{\texttt{figures.m}}
+\label{scr:figures}
+\lstinputlisting{../matlab/figures.m}
 
 \bibliography{sources}
 \bibliographystyle{IEEEtran}
