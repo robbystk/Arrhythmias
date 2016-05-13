@@ -35,14 +35,14 @@ ${BASE}.ps: ${BASE}.dvi
 	@dvips -q $<
 
 # --- DVI ---------------------------------------
-${BASE}.dvi: ${BASE}.tex ${BASE}.toc ${BASE}.bbl
+${BASE}.dvi: ${BASE}.tex ${BASE}.toc 
 	@echo "TEX  ${BASE}.tex"
 	@latex ${BASE}.tex >/dev/null
 
 # --- TOC ---------------------------------------
-${BASE}.toc: ${BASE}.tex
+${BASE}.toc: ${BASE}.tex ${BASE}.aux ${BASE}.bbl
 	@echo "TOC  ${BASE}.tex"
-	@latex ${BASE}.tex >/dev/null
+	@latex -draftmode ${BASE}.tex >/dev/null
 
 # --- AUX ---------------------------------------
 ${BASE}.aux: ${BASE}.tex 
