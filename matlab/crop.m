@@ -40,5 +40,6 @@ excerpt.signal = ecg.signal(s_index:e_index);
 excerpt.time = ecg.time(s_index:e_index);
 excerpt.N = e_index - s_index + 1;
 excerpt.ann = ecg.ann(beats) - s_index + 1;
+excerpt.type = ecg.type(beats);
 excerpt.Nann = length(excerpt.ann);
 end %function
