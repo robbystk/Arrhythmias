@@ -13,3 +13,4 @@
 *.swo
 *.mat
 *.asv
+figures/*.tex
