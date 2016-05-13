@@ -12,6 +12,7 @@ function plotecg(ecg, varargin)
 
     plot(ecg.time,ecg.signal); 
     xlim([min(ecg.time), max(ecg.time)]);
+    ys = ylim();
 
     if nargin > 1 && ismember('Latex',varargin)
         fig = gcf;
@@ -21,6 +22,7 @@ function plotecg(ecg, varargin)
         fig.CurrentAxes.YLabel.Interpreter = 'Latex';
     end %latex if
     if ismember('Annotate',varargin) && isfield(ecg,'type')
+        ty = ys(2) - (ys(2) - ys(1)) * 0.1;
         x = ecg.time(ecg.ann) + 0.05;
         y = ty * ones(ecg.Nann,1);
         strings = cellstr(ecg.type);
@@ -37,8 +39,6 @@ function plotecg(ecg, varargin)
     end %title if
     if ~(nargin == 0 || ismember('NoMarks',varargin))
         hold on;
-        ys = ylim();
-        ty = ys(2) - (ys(2) - ys(1)) * 0.1;
         for i = 1:ecg.Nann
             hold on;
             x = ecg.time(ecg.ann(i));
