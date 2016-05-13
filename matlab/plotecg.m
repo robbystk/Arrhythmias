@@ -1,26 +1,47 @@
-function plotecg(ecg)
+function plotecg(ecg, varargin)
 % plotecg: plots data from ECG struct with annotations
 % marked
-%   usage:  plotecg(ecg)
+%   usage:  plotecg(ecg,options)
 %   input:  the ecg struct to plot
+%       options:
+%           'Annotate': adds text labels if present
+%           'Latex':    uses Latex interpreter for all text
 %   output: none
 
     plot(ecg.time,ecg.signal); 
-    title('ECG','Interpreter','Latex');
-    xlabel('Time [s]','Interpreter','Latex');
-    ylabel('Amplitude','Interpreter','Latex');
+    title('ECG');
+    xlabel('Time [s]');
+    ylabel('Amplitude');
     xlim([min(ecg.time), max(ecg.time)]);
 
-    fig = gcf;
-    fig.CurrentAxes.TickLabelInterpreter = 'Latex';
-    
     hold on;
     ys = ylim();
-    ty = ys(2) - (ys(2) - ys(1)) * 0.9;
+    ty = ys(2) - (ys(2) - ys(1)) * 0.1;
+    
     for i = 1:ecg.Nann
         hold on;
         x = ecg.time(ecg.ann(i));
         line([x x],ys,'color','green');
     end % for
     hold off;
+    
+    if nargin > 1 
+        if ismember('Latex',varargin)
+            fig = gcf;
+            fig.CurrentAxes.TickLabelInterpreter = 'Latex';
+            fig.CurrentAxes.Title.Interpreter = 'Latex';
+            fig.CurrentAxes.XLabel.Interpreter = 'Latex';
+            fig.CurrentAxes.YLabel.Interpreter = 'Latex';
+        end %latex if
+        if ismember('Annotate',varargin) && isfield(ecg,'type')
+            x = ecg.time(ecg.ann) + 0.05;
+            y = ty * ones(ecg.Nann,1);
+            strings = cellstr(ecg.type);
+            if ismember('Latex',varargin)
+                text(x,y,strings,'Interpreter','Latex');
+            else
+                text(x,y,strings)
+            end %latex if
+        end %annotation if
+    end %nargin if
 end % function
