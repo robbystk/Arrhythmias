@@ -2,6 +2,8 @@
 
 \usepackage{amsmath}
 \usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{verbatim}
 \usepackage{tikz}
 
 \tikzstyle{block}=[rectangle,draw=black,thick,minimum size=1.2cm]
@@ -10,6 +12,7 @@
 \tikzstyle{operator}=[circle,draw=black,thick,inner sep=2pt]
 
 \newcommand{\ts}[1]{\textsuperscript{#1}}
+\newcommand{\rpref}[1]{\ref{#1} on page \pageref{#1}}
 
 \title{ECE480A3 Project Final Report: \\ Diagnosis of Cardiac Arrhythmias from 
 Electrocardiography Data}
@@ -73,7 +76,7 @@ as follows:
 \end{quotation}
 
 The data and annotations will be instrumental in training and testing the
-classification algorithm.  Figure \ref{fig:v} shows a portion of a recording
+classification algorithm.  Figure \ref{fig:raw} shows a portion of a recording
 from the Database with annotations showing normal beats, an atrial premature
 beat (A) and a premature ventricular contraction (V).  
 
@@ -131,9 +134,58 @@ different were used.  In addition to the principal components, the R-R interval
 for each beat was also found and used as an additional component.  
 
 \section{Implementation}
-The algorithm was implemented in MATLAB, much to the author's chagrin.  It was
-decided to distinguish A form normal because reasons (mostly I'm a dumbass) Here's
-some plots and shit.  
+The algorithm was implemented in MATLAB.  All code used is included in the
+appendix and available on github at
+\url{https://github.com/robbystk/Arrythmias}. The first step was to download ECG
+data and annotations from Physionet using the \verb`rdsamp()` and \verb`rdann()`
+functions from Physionet's WFDB toolbox as follows: 
+\begin{verbatim}
+[tm,sig] = rdsamp(url,1);
+[ann,type,subtype,chan,num,comments] = rdann(url,'atr');
+\end{verbatim}
+Where \verb`url` is the Physionet URL from which to download the data, e.g\@.
+\verb`'mitdb/100'`.  These lines were wrapped in a function to make them easier
+to use.  See page \pageref{fun:fetch} for the full function.  Figure
+\ref{fig:raw} shows an example of ECG data directly from physionet with beat
+annotations.  The annotations do not always correspond directly with the
+location of the QRS complex because they correspond to the entire beat rather
+than a specific feature.  So the next step is to determine the exact location of
+the QRS complexes.  
+
+\begin{figure}[hbtp]
+    \centering
+    \includegraphics[height=0.44\textheight]{../figures/figures_01}
+    \caption{Examples of Raw ECG Signals Showing Normal Beats (N), an Atrial
+    Premature Beat (A), and Premature Ventricular Contraction (V)}
+    \label{fig:raw}
+\end{figure}
+
+The first step in the Pan-Tomkins alorithm is to filter the signal.  This was
+done by a fourth-order Butterworth bandpass filter with cutoffs at 1 and 50Hz, 
+as well as a notch filter at 60Hz.  The full implementation is shown in the
+\verb`filterecg()` function in section \rpref{fun:filter}.  The effect of this
+filter on an ECG signal is shown in Figure \ref{fig:filter}.  The rest of the
+QRS-detection algorithm was implemented in the function \verb`findqrs()` shown
+in section \rpref{fun:qrs}.  Figure \ref{fig:qrs} shows an example of the
+signals at each stage of the algorithm.  
+
+\begin{figure}[hbtp]
+    \centering
+    \includegraphics[height=0.44\textheight]{../figures/figures_02}
+    \caption{The Effect of \texttt{filterecg()} on an ECG Signal}
+    \label{fig:filter}
+\end{figure}
+
+\begin{figure}[hbtp]
+    \centering
+    \includegraphics[height=0.44\textheight]{../figures/figures_03}
+    \caption{Example Signals at the Various Stages of the Pan-Tompkins
+    QRS-Detection Algorithm}
+    \label{fig:qrs}
+\end{figure}
+
+It was decided to distinguish A form normal because
+reasons (mostly I'm a dumbass) Here's some plots and shit.  
 
 The ease of distinguishing an arrhythmia with DSP depends on the particular
 arrhythmia.  During research, an arrhythmia will be chosen that should be
@@ -144,6 +196,42 @@ analysis.
 \section{Results}
 
 \section{Conclusion}
+
+\appendix
+\section{Matlab Code}
+\subsection{\texttt{fetch()}}
+\label{fun:fetch}
+\verbatiminput{../matlab/fetch.m}
+\subsection{\texttt{filterecg()}}
+\label{fun:filter}
+\verbatiminput{../matlab/filterecg.m}
+\subsection{\texttt{findqrs()}}
+\label{fun:qrs}
+\verbatiminput{../matlab/findqrs.m}
+\subsection{\texttt{crop()}}
+\label{fun:crop}
+\verbatiminput{../matlab/crop.m}
+\subsection{\texttt{pca\_transform()}}
+\label{fun:pca}
+\verbatiminput{../matlab/pca_transform.m}
+\subsection{\texttt{plotpca()}}
+\label{fun:plotpca}
+\verbatiminput{../matlab/plotpca.m}
+\subsection{\texttt{plotecg()}}
+\label{fun:plotecg}
+\verbatiminput{../matlab/plotecg.m}
+\subsection{\texttt{texify()}}
+\label{fun:tex}
+\verbatiminput{../matlab/texify.m}
+\subsection{\texttt{gather.m}}
+\label{scr:gather}
+\verbatiminput{../matlab/gather.m}
+\subsection{\texttt{figures.m}}
+\label{scr:figures}
+\verbatiminput{../matlab/figures.m}
+\subsection{\texttt{train.m}}
+\label{scr:train}
+\verbatiminput{../matlab/train.m}
 
 \bibliography{sources}
 \bibliographystyle{IEEEtran}
