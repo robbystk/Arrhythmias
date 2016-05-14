@@ -79,7 +79,7 @@ xlabel('Components (sorted)'); ylabel('Difference in Means');
 xlim([0 21]);
 texify(gcf);
 
-% keep only 10 most-varying dimensions
+% keep only 20 most-varying dimensions
 V_sub = V(:,I(1:20));
 save('V_sub','V_sub');
 norm_means = norm_means(I(1:10));
