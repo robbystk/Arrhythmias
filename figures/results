@@ -1,0 +1,11 @@
+total = 2965 
+true_negatives = 1348 
+false_positives = 122 
+false_negatives = 218 
+true_positives = 1277 
+percent_true_negatives = 45.4637 
+percent_false_positives = 4.1147 
+percent_false_negatives = 7.3524 
+percent_true_positives = 43.0691 
+sensitivity = 85.4181 
+specificity = 91.7007
