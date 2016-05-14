@@ -102,12 +102,12 @@ T_abnorm_sub = pca_transform(abnormal_signals,means,V_sub);
 
 figure(9);
 plot(T_norm_sub(:,1),T_norm_sub(:,2),'og',T_abnorm_sub(:,1),T_abnorm_sub(:,2),'sr');
-legend({'Normal Beats','Abnormal Beats'},'Interpreter','Latex');
 xs = xlim(); ys = ylim();
 xx = linspace(xs(1), xs(2), 64);
 yy = -w(1)/w(2)*xx - (w(end)-0.5)/w(2);
 line(xx,yy,'color','k');
 xlim(xs); ylim(ys);
+legend({'Normal Beats','Abnormal Beats','Decision Boundary'},'Interpreter','Latex');
 title('First Two Most-Significant Components and Decision Boundary');
 xlabel('First Most-Significant Component');
 ylabel('Second Most-Significant Component');
@@ -115,10 +115,16 @@ texify(gcf);
 
 %% Test Classifier
 d_out = X * w > 0.5;
-true_negatives = sum(d + d_out == 0) / length(d_out) * 100
-false_positives = sum(d - d_out == -1) / length(d_out) * 100
-false_negatives = sum(d - d_out == 1) / length(d_out) * 100
-true_positives = sum(d + d_out == 2) / length(d_out) * 100
+total = length(d)
+true_negatives = sum(d + d_out == 0)
+false_positives = sum(d - d_out == -1)
+false_negatives = sum(d - d_out == 1)
+true_positives = sum(d + d_out == 2)
+
+percent_true_negatives = sum(d + d_out == 0) / total * 100
+percent_false_positives = sum(d - d_out == -1) / total * 100
+percent_false_negatives = sum(d - d_out == 1) / total * 100
+percent_true_positives = sum(d + d_out == 2) / total * 100
 
 sensitivity = true_positives / (true_positives + false_negatives) * 100
 specificity = true_negatives / (true_negatives + false_positives) * 100
