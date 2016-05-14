@@ -4,6 +4,7 @@
 \usepackage{hyperref}
 \usepackage{graphicx}
 \usepackage{verbatim}
+\usepackage{xcolor}
 \usepackage{listings}
 \lstset{%
     basicstyle=\scriptsize\ttfamily, %
@@ -313,7 +314,41 @@ classified.  All 20 dimensions are necessary to classify each point.
     \label{fig:classifier}
 \end{figure}
 
-\section{Results}
+\section{Results} 
+The classifier result was calculated (\verb`train.m` line 117) and compared to
+the desired result to determine the number of true negatives, false positives,
+false negatives, and true positives (lines 118--121).  These results are shown
+in the confusion matrix in Figure \ref{fig:confusion}. The true positive rate
+(sensitivity) and true negative rate (specificity), were also determined.  
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[ultra thick]
+        \filldraw[fill=green!30,draw=gray!50!black] (-3,3) rectangle (0,0);
+        \filldraw[fill=red!30,draw=gray!50!black] (3,3) rectangle (0,0);
+        \filldraw[fill=red!30,draw=gray!50!black] (-3,-3) rectangle (0,0);
+        \filldraw[fill=green!30,draw=gray!50!black] (3,-3) rectangle (0,0);
+        \node[] at (-6,0.25) {True};
+        \node[] at (-6,-0.25) {Condition};
+        \node[] at (-4,-1.50) {Positive};
+        \node[] at (-4,1.50) {Negative};
+        \node[] at (-0,3.75) {Test Result};
+        \node[] at (-1.5,3.25) {Negative};
+        \node[] at (1.5,3.25) {Positive};
+        \node[] at (-1.5,1.75) {9001};
+        \node[] at (1.5,1.75) {9001};
+        \node[] at (-1.5,-1.25) {9001};
+        \node[] at (1.5,-1.25) {9001};
+        \node[] at (-1.5,1.25) {(9001\%)};
+        \node[] at (1.5,1.25) {(9001\%)};
+        \node[] at (-1.5,-1.75) {(9001\%)};
+        \node[] at (1.5,-1.75) {(9001\%)};
+    \end{tikzpicture}
+    \label{fig:confusion}
+    \caption{Confusion Matrix For Classifier: Total Cases: 9001, True Negatives:
+    9001 (9001\%), False Positives: 9001 (9001\%), False Negatives: 9001
+    (9001\%), True Positives: 9001 (9001\%)}
+\end{figure}
 
 \section{Conclusion}
 
