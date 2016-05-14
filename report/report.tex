@@ -314,12 +314,15 @@ classified.  All 20 dimensions are necessary to classify each point.
     \label{fig:classifier}
 \end{figure}
 
-\section{Results} 
+\section{Performance} 
 The classifier result was calculated (\verb`train.m` line 117) and compared to
 the desired result to determine the number of true negatives, false positives,
 false negatives, and true positives (lines 118--121).  These results are shown
 in the confusion matrix in Figure \ref{fig:confusion}. The true positive rate
-(sensitivity) and true negative rate (specificity), were also determined.  
+(sensitivity) and true negative rate (specificity), were also determined.  The
+sensitivity was found to be $\mathrm{TPR} = \frac{\mathrm{true}
++}{\mathrm{actual} +} = 85.4\%$, and the sensitivity was found to be
+$\mathrm{TNR} = \frac{\mathrm{true} -}{\mathrm{actual} -} = 91.7\%$
 
 \begin{figure}[htbp]
     \centering
@@ -332,25 +335,34 @@ in the confusion matrix in Figure \ref{fig:confusion}. The true positive rate
         \node[] at (-6,-0.25) {Condition};
         \node[] at (-4,-1.50) {Positive};
         \node[] at (-4,1.50) {Negative};
-        \node[] at (-0,3.75) {Test Result};
+        \node[] at (-0,3.75) {Classifier Result};
         \node[] at (-1.5,3.25) {Negative};
         \node[] at (1.5,3.25) {Positive};
-        \node[] at (-1.5,1.75) {9001};
-        \node[] at (1.5,1.75) {9001};
-        \node[] at (-1.5,-1.25) {9001};
-        \node[] at (1.5,-1.25) {9001};
-        \node[] at (-1.5,1.25) {(9001\%)};
-        \node[] at (1.5,1.25) {(9001\%)};
-        \node[] at (-1.5,-1.75) {(9001\%)};
-        \node[] at (1.5,-1.75) {(9001\%)};
+        \node[] at (-1.5,1.5) {1348};
+        \node[] at (1.5,1.5) {122};
+        \node[] at (-1.5,-1.5) {218};
+        \node[] at (1.5,-1.5) {1277};
     \end{tikzpicture}
     \label{fig:confusion}
-    \caption{Confusion Matrix For Classifier: Total Cases: 9001, True Negatives:
-    9001 (9001\%), False Positives: 9001 (9001\%), False Negatives: 9001
-    (9001\%), True Positives: 9001 (9001\%)}
+    \caption{Confusion Matrix For Classifier: Total Cases: 2965, True Negatives:
+    1348, False Positives: 122, False Negatives: 218, True Positives: 1277}
 \end{figure}
 
 \section{Conclusion}
+The beat classification algorithm performed surprisingly well given its
+simplicity and how the data are clustered in Figure \ref{fig:classifier}.  The
+sensitivity and specificity are reasonably high but could definitely be improved
+with more-sophisticated classification techniques, such as a support vector
+machine or artificial neural network.  This algorithm is not particularly
+remarkable, but is an excellent starting point for future development.  
+
+In retrospect, picking an arrhythmia that is very similar to a normal rhythm on
+an ECG made classification significantly harder.  If an arrhythmia presenting a
+more-drastic difference on the ECG was chosen, the classifier would have likely
+performed better.  An arrhythmia that is too different, though, would have made
+QRS detection harder, since the algorithm is based on assumptions about what the
+ECG will look like.  There is a trade-off between classifier performance and
+QRS-detection performance.  
 
 \newpage
 \appendix
